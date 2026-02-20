@@ -1,4 +1,4 @@
-// MC THE MAX 초성퀴즈 - Quiz interaction
+// M.C THE MAX 초성퀴즈 - Quiz interaction
 (function () {
     const form = document.getElementById("answer-form");
     const resultPanel = document.getElementById("result-panel");
@@ -24,7 +24,6 @@
                 showResult(data);
             })
             .catch(() => {
-                // Fallback to normal form submit
                 form.submit();
             });
     }
@@ -39,26 +38,16 @@
         form.style.display = "none";
         resultPanel.classList.remove("hidden");
 
-        const scoreClass =
-            data.total_score >= 75 ? "good" : data.total_score >= 25 ? "ok" : "bad";
-        const titleIcon =
-            data.title_match === "exact" ? "correct" : "wrong";
-        const lyricsIcon =
-            data.lyrics_match === "exact"
-                ? "correct"
-                : data.lyrics_match === "partial"
-                    ? "partial"
-                    : "wrong";
+        const emoji = data.correct ? "\ud83d\ude03" : "\ud83e\udd72";
+        const scoreClass = data.correct ? "good" : "bad";
 
         resultContent.innerHTML = `
-            <div class="score-line ${scoreClass}">+${data.total_score}점</div>
+            <div class="result-emoji">${emoji}</div>
+            <div class="score-line ${scoreClass}">${data.correct ? "정답!" : "오답"} +${data.score}점</div>
             <div class="answer-detail">
-                <div>곡명 정답: <strong>${esc(data.correct_title)}</strong></div>
-                <div>내 답: <span class="${titleIcon}">${esc(data.user_title) || "(미입력)"}</span>
-                    → <span class="${titleIcon}">+${data.title_score}</span></div>
-                <div style="margin-top:8px">가사 정답: <strong>${esc(data.correct_lyrics).replace(/\n/g, '<br>')}</strong></div>
-                <div>내 답: <span class="${lyricsIcon}">${esc(data.user_lyrics) || "(미입력)"}</span>
-                    → <span class="${lyricsIcon}">+${data.lyrics_score}</span></div>
+                <div>정답: <strong>${esc(data.correct_title)}</strong></div>
+                ${data.user_title ? '<div>내 답: ' + esc(data.user_title) + '</div>' : ''}
+                <div style="margin-top:8px">가사: <strong>${esc(data.correct_lyrics).replace(/\n/g, '<br>')}</strong></div>
             </div>
         `;
     }
@@ -67,7 +56,6 @@
 
     skipBtn.addEventListener("click", function () {
         document.getElementById("title").value = "";
-        document.getElementById("lyrics").value = "";
         submitAnswer(null);
     });
 
@@ -75,19 +63,10 @@
         window.location.href = "/quiz/question";
     });
 
-    // Enter key on lyrics field submits
-    document.getElementById("lyrics").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            submitAnswer(null);
-        }
-    });
-
-    // Tab from title to lyrics
     document.getElementById("title").addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
             e.preventDefault();
-            document.getElementById("lyrics").focus();
+            submitAnswer(null);
         }
     });
 })();

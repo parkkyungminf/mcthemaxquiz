@@ -114,20 +114,9 @@ def quiz_answer():
         return redirect(url_for("quiz_result"))
 
     title_answer = request.form.get("title", "").strip()
-    lyrics_answer = request.form.get("lyrics", "").strip()
 
-    # Score title
-    title_score = 0
-    title_match = "wrong"
-    if normalize_title(title_answer) == normalize_title(q["title"]):
-        title_score = 50
-        title_match = "exact"
-
-    # Score lyrics (2줄 합쳐서 비교, 줄바꿈 제거 후 비교)
-    correct_lyrics = q["line_text"].replace("\n", " ")
-    lyrics_score, lyrics_match = check_lyrics(lyrics_answer, correct_lyrics)
-
-    total_q_score = title_score + lyrics_score
+    # Score title only
+    correct = normalize_title(title_answer) == normalize_title(q["title"])
 
     result = {
         "question_no": current + 1,
@@ -135,16 +124,12 @@ def quiz_answer():
         "correct_title": q["title"],
         "correct_lyrics": q["line_text"],
         "user_title": title_answer,
-        "user_lyrics": lyrics_answer,
-        "title_match": title_match,
-        "lyrics_match": lyrics_match,
-        "title_score": title_score,
-        "lyrics_score": lyrics_score,
-        "total_score": total_q_score,
+        "correct": correct,
+        "score": 100 if correct else 0,
         "difficulty": q.get("difficulty", ""),
     }
 
-    session["score"] = session.get("score", 0) + total_q_score
+    session["score"] = session.get("score", 0) + result["score"]
     results = session.get("results", [])
     results.append(result)
     session["results"] = results

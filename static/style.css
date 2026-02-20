@@ -238,10 +238,16 @@ header h1 a {
 .result-panel .correct-info {
     margin-bottom: 12px;
 }
+.result-emoji {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
 .result-panel .score-line {
     font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 8px;
+    text-align: center;
 }
 .result-panel .score-line.good { color: var(--success); }
 .result-panel .score-line.ok { color: var(--warning); }
