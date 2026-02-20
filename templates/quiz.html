@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}문제 {{ current }}/{{ total }} - MC THE MAX 초성퀴즈{% endblock %}
+{% block content %}
+<div class="quiz-header">
+    <div class="progress-info">
+        <span class="question-no">{{ current }} / {{ total }}</span>
+        <span class="current-score">{{ score }}점</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ (current - 1) / total * 100 }}%"></div>
+    </div>
+    {% if question.difficulty %}
+    <span class="badge badge-{{ question.difficulty }}">{{ question.difficulty }}</span>
+    {% endif %}
+</div>
+
+<div class="quiz-body">
+    <div class="chosung-display" id="chosung">{{ question.chosung }}</div>
+    <p class="hint-chars">{{ question.char_count }}글자</p>
+
+    <form id="answer-form" action="/quiz/answer" method="post">
+        <div class="input-group">
+            <label for="title">곡명</label>
+            <input type="text" id="title" name="title" placeholder="곡 제목을 입력하세요"
+                   autocomplete="off" autofocus>
+        </div>
+        <div class="input-group">
+            <label for="lyrics">가사</label>
+            <input type="text" id="lyrics" name="lyrics" placeholder="가사를 입력하세요"
+                   autocomplete="off">
+        </div>
+        <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="submit-btn">제출</button>
+            <button type="button" class="btn btn-skip" id="skip-btn">모르겠어요</button>
+        </div>
+    </form>
+
+    <div id="result-panel" class="result-panel hidden">
+        <div id="result-content"></div>
+        <button type="button" class="btn btn-primary" id="next-btn">다음 문제</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='quiz.js') }}"></script>
+{% endblock %}

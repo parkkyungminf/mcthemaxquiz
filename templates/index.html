@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}MC THE MAX 초성퀴즈{% endblock %}
+{% block content %}
+<div class="hero">
+    <p class="subtitle">가사의 초성을 보고 곡명과 가사를 맞춰보세요!</p>
+</div>
+
+<div class="stats-bar">
+    <span>수록곡 <strong>{{ total_songs }}</strong></span>
+    <span>가사 <strong>{{ total_lines }}</strong>줄</span>
+    <span>퀴즈 <strong>{{ total_quiz }}</strong>문제</span>
+</div>
+
+<form action="/quiz/start" method="post" class="difficulty-form">
+    <h2>난이도 선택</h2>
+    <div class="difficulty-grid">
+        <button type="submit" name="difficulty" value="easy" class="diff-btn easy">
+            <span class="diff-label">Easy</span>
+            <span class="diff-desc">히트곡 명가사</span>
+            <span class="diff-count">{{ stats.get('easy', 0) }}문제</span>
+        </button>
+        <button type="submit" name="difficulty" value="normal" class="diff-btn normal">
+            <span class="diff-label">Normal</span>
+            <span class="diff-desc">타이틀곡 가사</span>
+            <span class="diff-count">{{ stats.get('normal', 0) }}문제</span>
+        </button>
+        <button type="submit" name="difficulty" value="hard" class="diff-btn hard">
+            <span class="diff-label">Hard</span>
+            <span class="diff-desc">비타이틀곡</span>
+            <span class="diff-count">{{ stats.get('hard', 0) }}문제</span>
+        </button>
+        <button type="submit" name="difficulty" value="very_hard" class="diff-btn very-hard">
+            <span class="diff-label">Very Hard</span>
+            <span class="diff-desc">수록곡 가사</span>
+            <span class="diff-count">{{ stats.get('very_hard', 0) }}문제</span>
+        </button>
+        <button type="submit" name="difficulty" value="mixed" class="diff-btn mixed">
+            <span class="diff-label">Mixed</span>
+            <span class="diff-desc">골고루 섞기</span>
+            <span class="diff-count">10문제</span>
+        </button>
+    </div>
+</form>
+{% endblock %}

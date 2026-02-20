@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}결과 - MC THE MAX 초성퀴즈{% endblock %}
+{% block content %}
+<div class="result-hero">
+    <h2>퀴즈 완료!</h2>
+    <div class="final-score">
+        <span class="score-number">{{ score }}</span>
+        <span class="score-total">/ {{ total }}점</span>
+    </div>
+    {% set pct = (score / total * 100) | int if total > 0 else 0 %}
+    <div class="score-grade">
+        {% if pct >= 90 %}
+            <span class="grade s">S</span> 진정한 M.C the MAX 팬!
+        {% elif pct >= 70 %}
+            <span class="grade a">A</span> 꽤 잘 알고 있네요!
+        {% elif pct >= 50 %}
+            <span class="grade b">B</span> 나쁘지 않아요!
+        {% elif pct >= 30 %}
+            <span class="grade c">C</span> 조금 더 들어보세요!
+        {% else %}
+            <span class="grade d">D</span> 앨범 정주행 추천!
+        {% endif %}
+    </div>
+</div>
+
+<div class="result-detail">
+    <h3>문제별 결과</h3>
+    <div class="result-list">
+        {% for r in results %}
+        <div class="result-item {% if r.total_score >= 75 %}good{% elif r.total_score >= 25 %}ok{% else %}bad{% endif %}">
+            <div class="result-q-header">
+                <span class="q-no">#{{ r.question_no }}</span>
+                {% if r.difficulty %}
+                <span class="badge badge-{{ r.difficulty }}">{{ r.difficulty }}</span>
+                {% endif %}
+                <span class="q-score">{{ r.total_score }}점</span>
+            </div>
+            <div class="result-chosung">{{ r.chosung }}</div>
+            <div class="result-answers">
+                <div class="answer-row">
+                    <span class="label">정답 곡명:</span>
+                    <span class="value">{{ r.correct_title }}</span>
+                </div>
+                <div class="answer-row">
+                    <span class="label">내 답:</span>
+                    <span class="value {% if r.title_match == 'exact' %}correct{% else %}wrong{% endif %}">
+                        {{ r.user_title or '(미입력)' }}
+                        {% if r.title_match == 'exact' %}+50{% else %}+0{% endif %}
+                    </span>
+                </div>
+                <div class="answer-row">
+                    <span class="label">정답 가사:</span>
+                    <span class="value">{{ r.correct_lyrics }}</span>
+                </div>
+                <div class="answer-row">
+                    <span class="label">내 답:</span>
+                    <span class="value {% if r.lyrics_match == 'exact' %}correct{% elif r.lyrics_match == 'partial' %}partial{% else %}wrong{% endif %}">
+                        {{ r.user_lyrics or '(미입력)' }}
+                        {% if r.lyrics_match == 'exact' %}+50{% elif r.lyrics_match == 'partial' %}+25{% else %}+0{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="btn-row center">
+    <a href="/" class="btn btn-primary">다시 도전하기</a>
+</div>
+{% endblock %}
