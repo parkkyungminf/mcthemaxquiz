@@ -123,8 +123,9 @@ def quiz_answer():
         title_score = 50
         title_match = "exact"
 
-    # Score lyrics
-    lyrics_score, lyrics_match = check_lyrics(lyrics_answer, q["line_text"])
+    # Score lyrics (2줄 합쳐서 비교, 줄바꿈 제거 후 비교)
+    correct_lyrics = q["line_text"].replace("\n", " ")
+    lyrics_score, lyrics_match = check_lyrics(lyrics_answer, correct_lyrics)
 
     total_q_score = title_score + lyrics_score
 

@@ -56,7 +56,7 @@
                 <div>곡명 정답: <strong>${esc(data.correct_title)}</strong></div>
                 <div>내 답: <span class="${titleIcon}">${esc(data.user_title) || "(미입력)"}</span>
                     → <span class="${titleIcon}">+${data.title_score}</span></div>
-                <div style="margin-top:8px">가사 정답: <strong>${esc(data.correct_lyrics)}</strong></div>
+                <div style="margin-top:8px">가사 정답: <strong>${esc(data.correct_lyrics).replace(/\n/g, '<br>')}</strong></div>
                 <div>내 답: <span class="${lyricsIcon}">${esc(data.user_lyrics) || "(미입력)"}</span>
                     → <span class="${lyricsIcon}">+${data.lyrics_score}</span></div>
             </div>

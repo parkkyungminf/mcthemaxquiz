@@ -35,7 +35,7 @@
                 {% endif %}
                 <span class="q-score">{{ r.total_score }}점</span>
             </div>
-            <div class="result-chosung">{{ r.chosung }}</div>
+            <div class="result-chosung">{% for line in r.chosung.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
             <div class="result-answers">
                 <div class="answer-row">
                     <span class="label">정답 곡명:</span>

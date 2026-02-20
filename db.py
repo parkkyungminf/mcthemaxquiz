@@ -104,6 +104,14 @@ def get_unclassified_lines(limit: int = 200) -> list[dict]:
         ).fetchall()]
 
 
+def _merge_two_lines(row: dict) -> dict:
+    """2줄의 초성/가사를 합쳐서 반환."""
+    row["chosung"] = row["chosung"] + "\n" + row.pop("chosung_2")
+    row["line_text"] = row["line_text"] + "\n" + row.pop("line_text_2")
+    row["char_count"] = row["char_count"] + row.pop("char_count_2")
+    return row
+
+
 # --- Quiz queries ---
 
 def upsert_quiz_line(lyrics_line_id: int, difficulty: str, classified_at: str):
@@ -117,16 +125,20 @@ def upsert_quiz_line(lyrics_line_id: int, difficulty: str, classified_at: str):
 
 def get_quiz_questions(difficulty: str, count: int = 10) -> list[dict]:
     with get_db() as conn:
-        return [dict(r) for r in conn.execute(
-            "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, ll.line_text, ll.chosung, "
-            "ll.char_count, s.title, s.track_id "
+        rows = conn.execute(
+            "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, "
+            "ll.line_text, ll.chosung, ll.char_count, ll.line_no, ll.track_id, "
+            "ll2.line_text as line_text_2, ll2.chosung as chosung_2, ll2.char_count as char_count_2, "
+            "s.title "
             "FROM quiz_lines ql "
             "JOIN lyrics_lines ll ON ql.lyrics_line_id = ll.id "
+            "JOIN lyrics_lines ll2 ON ll2.track_id = ll.track_id AND ll2.line_no = ll.line_no + 1 "
             "JOIN songs s ON ll.track_id = s.track_id "
             "WHERE ql.difficulty = ? "
             "ORDER BY RANDOM() LIMIT ?",
             (difficulty, count),
-        ).fetchall()]
+        ).fetchall()
+        return [_merge_two_lines(dict(r)) for r in rows]
 
 
 def get_quiz_questions_mixed(count: int = 10) -> list[dict]:
@@ -136,31 +148,37 @@ def get_quiz_questions_mixed(count: int = 10) -> list[dict]:
     with get_db() as conn:
         for diff, n in distribution:
             rows = conn.execute(
-                "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, ll.line_text, ll.chosung, "
-                "ll.char_count, s.title, s.track_id "
+                "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, "
+                "ll.line_text, ll.chosung, ll.char_count, ll.line_no, ll.track_id, "
+                "ll2.line_text as line_text_2, ll2.chosung as chosung_2, ll2.char_count as char_count_2, "
+                "s.title "
                 "FROM quiz_lines ql "
                 "JOIN lyrics_lines ll ON ql.lyrics_line_id = ll.id "
+                "JOIN lyrics_lines ll2 ON ll2.track_id = ll.track_id AND ll2.line_no = ll.line_no + 1 "
                 "JOIN songs s ON ll.track_id = s.track_id "
                 "WHERE ql.difficulty = ? "
                 "ORDER BY RANDOM() LIMIT ?",
                 (diff, n),
             ).fetchall()
-            questions.extend(dict(r) for r in rows)
+            questions.extend(_merge_two_lines(dict(r)) for r in rows)
     return questions
 
 
 def get_quiz_question_by_id(quiz_id: int) -> dict | None:
     with get_db() as conn:
         row = conn.execute(
-            "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, ll.line_text, ll.chosung, "
-            "ll.char_count, s.title, s.track_id "
+            "SELECT ql.id as quiz_id, ql.difficulty, ll.id as line_id, "
+            "ll.line_text, ll.chosung, ll.char_count, ll.line_no, ll.track_id, "
+            "ll2.line_text as line_text_2, ll2.chosung as chosung_2, ll2.char_count as char_count_2, "
+            "s.title "
             "FROM quiz_lines ql "
             "JOIN lyrics_lines ll ON ql.lyrics_line_id = ll.id "
+            "JOIN lyrics_lines ll2 ON ll2.track_id = ll.track_id AND ll2.line_no = ll.line_no + 1 "
             "JOIN songs s ON ll.track_id = s.track_id "
             "WHERE ql.id = ?",
             (quiz_id,),
         ).fetchone()
-        return dict(row) if row else None
+        return _merge_two_lines(dict(row)) if row else None
 
 
 def get_difficulty_stats() -> dict:

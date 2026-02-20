@@ -15,8 +15,8 @@
 </div>
 
 <div class="quiz-body">
-    <div class="chosung-display" id="chosung">{{ question.chosung }}</div>
-    <p class="hint-chars">{{ question.char_count }}글자</p>
+    <div class="chosung-display" id="chosung">{% for line in question.chosung.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
+    <p class="hint-chars">총 {{ question.char_count }}글자</p>
 
     <form id="answer-form" action="/quiz/answer" method="post">
         <div class="input-group">
